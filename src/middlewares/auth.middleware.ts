@@ -1,0 +1,44 @@
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import { ENV } from "../config/env";
+
+interface JwtPayload extends jwt.JwtPayload {
+  id: string;
+}
+
+export const authMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No token provided",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: No token provided",
+      });
+    }
+
+    const decoded = jwt.verify(token, ENV.JWT_SECRET) as unknown as JwtPayload;
+
+    req.user = { id: decoded.id };
+
+    next();
+  } catch (e) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: Invalid token",
+    });
+  }
+};
