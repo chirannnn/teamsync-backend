@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/env";
+import { User } from "../models/User";
 
 interface JwtPayload extends jwt.JwtPayload {
   id: string;
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -32,7 +33,16 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, ENV.JWT_SECRET) as unknown as JwtPayload;
 
-    req.user = { id: decoded.id };
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    req.user = user;
 
     next();
   } catch (e) {

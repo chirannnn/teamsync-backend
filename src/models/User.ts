@@ -4,6 +4,9 @@ interface IUser extends Document {
   username: string;
   email: string;
   password: string;
+  role: "owner" | "member";
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const UserSchema: Schema<IUser> = new Schema(
@@ -14,17 +17,20 @@ const UserSchema: Schema<IUser> = new Schema(
       unique: true,
       trim: true,
     },
-
     email: {
       type: String,
       required: true,
       unique: true,
       lowercase: true,
     },
-
     password: {
       type: String,
       required: true,
+    },
+    role: {
+      type: String,
+      enum: ["owner", "member"],
+      default: "member",
     },
   },
   { timestamps: true },
