@@ -1,6 +1,7 @@
 import express, { Express, Request, Response } from "express";
 import authRoutes from "./routes/auth.routes";
 import workspacesRoutes from "./routes/workspace.routes";
+import projectRoutes from "./routes/project.routes";
 
 const app: Express = express();
 
@@ -12,5 +13,6 @@ app.get("/api/v1", (req: Request, res: Response) => {
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/workspaces", workspacesRoutes);
+app.use("/api/v1/projects", projectRoutes);
 
 export default app;

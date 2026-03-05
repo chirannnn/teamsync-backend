@@ -6,7 +6,7 @@ interface IWorkspace extends Document {
   members: mongoose.Types.ObjectId[];
 }
 
-const workspaceSchma = new Schema(
+const workspaceSchma = new Schema<IWorkspace>(
   {
     name: {
       type: String,
