@@ -4,7 +4,7 @@ import {
   getProjectsByWorkspaceService,
   updateProjectService,
   deleteProjectService,
-} from "../services/project.services";
+} from "../services/project.service";
 
 export const createProject = async (
   req: Request<{}, {}, { name: string; workspaceId: string }>,
