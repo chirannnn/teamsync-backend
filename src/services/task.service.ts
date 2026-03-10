@@ -67,7 +67,12 @@ export const createTaskService = async (data: any, userId: string) => {
 };
 
 // GET TASKS BY PROJECT
-export const getTasksByProjectService = async (projectId: string) => {
+export const getTasksByProjectService = async (
+  projectId: string,
+  page: number,
+  limit: number,
+  status?: string,
+) => {
   if (!mongoose.Types.ObjectId.isValid(projectId)) {
     throw new Error("Invalid project ID");
   }
@@ -77,13 +82,27 @@ export const getTasksByProjectService = async (projectId: string) => {
     throw new Error("Project not found");
   }
 
-  return Task.find({ project: projectId })
+  const filter: any = { project: projectId };
+
+  if (status) {
+    filter.status = status;
+  }
+
+  const tasks = await Task.find(filter)
+    .skip((page - 1) * limit)
+    .limit(limit)
     .populate("assignedTo", "username email")
     .populate("createdBy", "username email");
+
+  return tasks;
 };
 
 // UPDATE TASK
-export const updateTaskService = async (taskId: string, data: any) => {
+export const updateTaskService = async (
+  taskId: string,
+  userId: string,
+  data: any,
+) => {
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     throw new Error("Invalid Task ID");
   }
@@ -91,6 +110,15 @@ export const updateTaskService = async (taskId: string, data: any) => {
   const task = await Task.findById(taskId);
   if (!task) {
     throw new Error("Task not found");
+  }
+
+  const workspace = await Workspace.findById(task.workspace);
+
+  if (
+    task.createdBy.toString() !== userId &&
+    workspace?.owner.toString() !== userId
+  ) {
+    throw new Error("You are not allowed to update this task");
   }
 
   const { title, description, priority, dueDate, status, assignedTo } = data;
@@ -120,7 +148,7 @@ export const updateTaskService = async (taskId: string, data: any) => {
 };
 
 // DELETE Task
-export const deleteTaskService = async (taskId: string) => {
+export const deleteTaskService = async (taskId: string, userId: string) => {
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     throw new Error("Invalid task Id");
   }
@@ -128,6 +156,15 @@ export const deleteTaskService = async (taskId: string) => {
   const task = await Task.findById(taskId);
   if (!task) {
     throw new Error("Task not found");
+  }
+
+  const workspace = await Workspace.findById(task.workspace);
+
+  if (
+    task.createdBy.toString() !== userId &&
+    workspace?.owner.toString() !== userId
+  ) {
+    throw new Error("You are not allowed to delete this task");
   }
 
   await task.deleteOne();

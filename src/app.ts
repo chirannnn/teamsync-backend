@@ -3,6 +3,7 @@ import authRoutes from "./routes/auth.routes";
 import workspacesRoutes from "./routes/workspace.routes";
 import projectRoutes from "./routes/project.routes";
 import taskRoutes from "./routes/task.routes";
+import commentRoutes from "./routes/comment.routes";
 
 const app: Express = express();
 
@@ -16,5 +17,6 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/workspaces", workspacesRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/comments", commentRoutes);
 
 export default app;
