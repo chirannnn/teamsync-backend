@@ -6,7 +6,7 @@ interface IWorkspace extends Document {
   members: mongoose.Types.ObjectId[];
 }
 
-const workspaceSchma = new Schema<IWorkspace>(
+const workspaceSchema = new Schema<IWorkspace>(
   {
     name: {
       type: String,
@@ -30,5 +30,5 @@ const workspaceSchma = new Schema<IWorkspace>(
 
 export const Workspace = mongoose.model<IWorkspace>(
   "Workspace",
-  workspaceSchma,
+  workspaceSchema,
 );

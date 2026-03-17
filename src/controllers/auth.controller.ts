@@ -17,7 +17,7 @@ export const register = async (req: Request, res: Response) => {
       data,
     });
   } catch (e) {
-    res.status(500).json({
+    res.status(400).json({
       success: false,
       message: "Registration failed",
     });
@@ -36,7 +36,7 @@ export const login = async (req: Request, res: Response) => {
       data,
     });
   } catch (e) {
-    res.status(500).json({
+    res.status(401).json({
       success: false,
       message: "Login failed",
     });
@@ -63,7 +63,7 @@ export const changePassword = async (req: Request, res: Response) => {
       message: "Password changed successfully",
     });
   } catch (e) {
-    res.status(500).json({
+    res.status(401).json({
       success: false,
       message: "Password change failed",
     });

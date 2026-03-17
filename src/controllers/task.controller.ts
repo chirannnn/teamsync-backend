@@ -7,13 +7,28 @@ import {
   getWorkspaceStatsService,
 } from "../services/task.service";
 
-export const createTask = async (req: any, res: Response) => {
+export const createTask = async (
+  req: Request<
+    {},
+    {},
+    {
+      title: string;
+      description?: string;
+      priority?: "low" | "medium" | "high";
+      dueDate?: Date;
+      project: string;
+      workspace: string;
+      assignedTo?: string;
+    }
+  >,
+  res: Response,
+) => {
   try {
     const userId = req.user.id;
 
     const task = await createTaskService(req.body, userId);
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       data: task,
     });
@@ -57,7 +72,18 @@ export const getTasksByProject = async (
 };
 
 export const updateTask = async (
-  req: Request<{ taskId: string }>,
+  req: Request<
+    { taskId: string },
+    {},
+    {
+      title?: string;
+      description?: string;
+      priority?: "low" | "medium" | "high";
+      dueDate?: Date;
+      status?: "todo" | "in-progress" | "done";
+      assignedTo?: string;
+    }
+  >,
   res: Response,
 ) => {
   try {

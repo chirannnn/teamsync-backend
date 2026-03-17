@@ -63,7 +63,7 @@ export const removeMemberService = async (
   }
 
   if (workspace.owner.toString() !== ownerId) {
-    throw new Error("Only owner can add members");
+    throw new Error("Only owner can remove members");
   }
 
   workspace.members = workspace.members.filter(

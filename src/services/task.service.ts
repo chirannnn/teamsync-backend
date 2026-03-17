@@ -4,8 +4,30 @@ import { Project } from "../models/Project";
 import { Workspace } from "../models/Workspace";
 import { User } from "../models/User";
 
+interface CreateTaskInput {
+  title: string;
+  description?: string;
+  priority?: "low" | "medium" | "high";
+  dueDate?: Date;
+  project: string;
+  workspace: string;
+  assignedTo?: string;
+}
+
+interface UpdateTaskInput {
+  title?: string;
+  description?: string;
+  priority?: "low" | "medium" | "high";
+  dueDate?: Date;
+  status?: "todo" | "in-progress" | "done";
+  assignedTo?: string;
+}
+
 // CREATE TASK
-export const createTaskService = async (data: any, userId: string) => {
+export const createTaskService = async (
+  data: CreateTaskInput,
+  userId: string,
+) => {
   const {
     title,
     description,
@@ -41,27 +63,31 @@ export const createTaskService = async (data: any, userId: string) => {
     throw new Error("Project does not belong to this workspace");
   }
 
+  let assignedUserId;
   if (assignedTo) {
     if (!mongoose.Types.ObjectId.isValid(assignedTo)) {
       throw new Error("Invalid assigned user ID");
     }
-
     const user = await User.findById(assignedTo);
-    if (!user) {
-      throw new Error("Assigned user not found");
-    }
+    if (!user) throw new Error("Assigned user not found");
+
+    assignedUserId = new mongoose.Types.ObjectId(assignedTo);
   }
 
-  const task = await Task.create({
+  const taskData: any = {
     title,
-    description,
-    priority,
-    dueDate,
     project,
     workspace,
-    assignedTo,
     createdBy: userId,
-  });
+  };
+
+  if (description !== undefined) taskData.description = description;
+  if (priority !== undefined) taskData.priority = priority;
+  if (dueDate !== undefined) taskData.dueDate = dueDate;
+  if (assignedUserId !== undefined) taskData.assignedTo = assignedUserId;
+
+  // Create task
+  const task = await Task.create(taskData);
 
   return task;
 };
@@ -101,7 +127,7 @@ export const getTasksByProjectService = async (
 export const updateTaskService = async (
   taskId: string,
   userId: string,
-  data: any,
+  data: UpdateTaskInput,
 ) => {
   if (!mongoose.Types.ObjectId.isValid(taskId)) {
     throw new Error("Invalid Task ID");
@@ -139,7 +165,7 @@ export const updateTaskService = async (
       throw new Error("Assigned user not found");
     }
 
-    task.assignedTo = assignedTo;
+    task.assignedTo = new mongoose.Types.ObjectId(assignedTo);
   }
 
   await task.save();
